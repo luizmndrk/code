@@ -1,0 +1,72 @@
+package infixconverter;
+
+import java.util.*;
+
+public class InfixConverter {
+    
+    // Function to get precedence of operators
+    static int precedence(char ch) {
+        switch (ch) {
+            case '+': case '-':
+                return 1;
+            case '*': case '/': case '%':  // Added '%' operator
+                return 2;
+            case '^':
+                return 3;
+            case '&': case '|': // If you're considering bitwise operators
+                return 4; 
+        }
+        return -1;
+    }
+    
+    // Function to convert infix to postfix
+    static String infixToPostfix(String exp) {
+        StringBuilder result = new StringBuilder();
+        Stack<Character> stack = new Stack<>();
+        
+        for (char c : exp.toCharArray()) {
+            if (Character.isLetterOrDigit(c)) {
+                result.append(c);
+            } else if (c == '(') {
+                stack.push(c);
+            } else if (c == ')') {
+                while (!stack.isEmpty() && stack.peek() != '(')
+                    result.append(stack.pop());
+                stack.pop();
+            } else {
+                while (!stack.isEmpty() && precedence(stack.peek()) >= precedence(c))
+                    result.append(stack.pop());
+                stack.push(c);
+            }
+        }
+        while (!stack.isEmpty())
+            result.append(stack.pop());
+        
+        return result.toString();
+    }
+    
+    // Function to convert infix to prefix
+    static String infixToPrefix(String exp) {
+        StringBuilder reversed = new StringBuilder(exp).reverse();
+        
+        for (int i = 0; i < reversed.length(); i++) {
+            if (reversed.charAt(i) == '(')
+                reversed.setCharAt(i, ')');
+            else if (reversed.charAt(i) == ')')
+                reversed.setCharAt(i, '(');
+        }
+        
+        String postfix = infixToPostfix(reversed.toString());
+        return new StringBuilder(postfix).reverse().toString();
+    }
+    
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        
+        while (true) {
+            System.out.print("Enter an infix expression (or type 'exit' to quit): ");
+            String infix = scanner.nextLine().trim();
+            
+            // Exit the loop if the user types "exit"
+            if (infix.equalsIgnoreCase("exit")) {
+                S
